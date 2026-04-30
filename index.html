@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Team Task Manager</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { margin: 5px; padding: 8px; }
+    .box { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+<h2>Team Task Manager</h2>
+
+<!-- AUTH -->
+<div class="box">
+  <h3>Signup / Login</h3>
+  <input id="name" placeholder="Name">
+  <input id="email" placeholder="Email">
+  <input id="password" placeholder="Password" type="password">
+  <br>
+  <button onclick="register()">Register</button>
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- PROJECT -->
+<div class="box">
+  <h3>Create Project</h3>
+  <input id="projectName" placeholder="Project Name">
+  <button onclick="createProject()">Create</button>
+</div>
+
+<!-- TASK -->
+<div class="box">
+  <h3>Create Task</h3>
+  <input id="title" placeholder="Task Title">
+  <input id="projectId" placeholder="Project ID">
+  <input id="assignedTo" placeholder="User ID">
+  <button onclick="createTask()">Create Task</button>
+</div>
+
+<!-- DASHBOARD -->
+<div class="box">
+  <h3>Dashboard</h3>
+  <button onclick="getDashboard()">Load Dashboard</button>
+  <p id="dashboardData"></p>
+</div>
+
+<script>
+const BASE_URL = "YOUR_BACKEND_URL";
+
+let token = "";
+
+// REGISTER
+async function register() {
+  const res = await fetch(BASE_URL + "/api/auth/register", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value
+    })
+  });
+  alert("Registered!");
+}
+
+// LOGIN
+async function login() {
+  const res = await fetch(BASE_URL + "/api/auth/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value
+    })
+  });
+
+  const data = await res.json();
+  token = data.token;
+  alert("Logged in!");
+}
+
+// CREATE PROJECT
+async function createProject() {
+  await fetch(BASE_URL + "/api/projects", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({
+      name: document.getElementById("projectName").value
+    })
+  });
+  alert("Project Created!");
+}
+
+// CREATE TASK
+async function createTask() {
+  await fetch(BASE_URL + "/api/tasks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({
+      title: document.getElementById("title").value,
+      project: document.getElementById("projectId").value,
+      assignedTo: document.getElementById("assignedTo").value
+    })
+  });
+  alert("Task Created!");
+}
+
+// DASHBOARD
+async function getDashboard() {
+  const res = await fetch(BASE_URL + "/api/dashboard", {
+    headers: {
+      "Authorization": token
+    }
+  });
+
+  const data = await res.json();
+
+  document.getElementById("dashboardData").innerText =
+    `Total: ${data.total}, Todo: ${data.todo}, Done: ${data.done}, Overdue: ${data.overdue}`;
+}
+</script>
+
+</body>
+  </html>
