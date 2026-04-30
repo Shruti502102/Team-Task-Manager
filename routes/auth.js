@@ -1,6 +1,28 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
+const express = require("express");
+const router = express.Router();
+const jwt = require("jsonwebtoken");
+
+// Signup (fake)
+router.post("/signup", (req, res) => {
+  const { name, email } = req.body;
+
+  const token = jwt.sign({ email }, process.env.JWT_SECRET);
+
+  res.json({ token, user: { name, email } });
+});
+
+// Login (fake)
+router.post("/login", (req, res) => {
+  const { email } = req.body;
+
+  const token = jwt.sign({ email }, process.env.JWT_SECRET);
+
+  res.json({ token, user: { email } });
+});
+
+module.exports = router;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
